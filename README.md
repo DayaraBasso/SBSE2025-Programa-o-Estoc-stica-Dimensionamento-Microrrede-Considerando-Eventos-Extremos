@@ -1,6 +1,6 @@
-# SBSE2025-Programa-o-Estoc-stica-Dimensionamento-Microrrede-Considerando-Eventos-Extremos
+# Modelo-de-Programacao-Estocastica-Dimensionamento-Microrrede-Considerando-Eventos-Extremos
 
-Programação Estocástica Aplicada ao Dimensionamento de uma Microrrede de Alimentação de uma Estação de Recarga de Veículos Elétricos Considerando Eventos Extremos
+SBSE 2025 - Programação Estocástica Aplicada ao Dimensionamento de uma Microrrede de Alimentação de uma Estação de Recarga de Veículos Elétricos Considerando Eventos Extremos
 
 Elaborado por: Dayara Pereira Basso
 
