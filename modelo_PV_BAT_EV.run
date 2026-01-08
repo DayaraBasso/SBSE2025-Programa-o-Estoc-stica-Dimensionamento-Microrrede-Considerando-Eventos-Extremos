@@ -1,0 +1,112 @@
+reset;	                        # Limpar as variaveis
+# model modelo_PV_BAT_EV_novo.mod;   # Chamar o modelo
+model modelo_PV_BAT_EV.mod;   # Chamar o modelo
+# data modelo_PV_BAT_EV.dat;	# Chamar os dados do modelo
+data modelo_PV_BAT_EV_dadosdolar.dat;	# Chamar os dados do modelo
+
+# fix y := 2;
+# fix z := 45;
+
+# fix x[1,3]:=1;
+# fix x[3,2]:=1;
+# fix x[2,7]:=1;
+# fix x[7,8]:=1;
+# fix x[8,11]:=1;
+# fix x[11,13]:=1;
+# fix x[13,14]:=1;
+# fix x[14,12]:=1;
+# fix x[12,9]:=1;
+# fix x[9,10]:=1;
+# fix x[10,6]:=1;
+# fix x[6,15]:=1;
+# fix x[15,5]:=1; 
+# fix x[5,4]:=1;
+# fix x[4,1]:=1;
+
+
+#option solver cplexamp;
+option solver cplex;
+# option cplex_options " absmipgap=0 relmipgap=0";
+# option cplex_options "time = 300";
+# option cplex_options "time = 300  mipgap=0 absmipgap=0"
+option cplex_options "mipdisplay=4 mipgap=0 mipinterval = 100000 mipgap=0 absmipgap=0"
+;
+
+solve fo;
+
+############################################################
+# VISUALIZAÇÃO 
+printf '\n\nParametros usados no teste: \n';
+display v_max; # Velocidade constante do VE  
+display tau_CHmax; # Tempo máximo de carregamento do VE
+display tau_CHmin; # Tempo mínimo de carregamento VE
+display Pcargamax; # Potência máxima de carregamento do VE
+display SOC_inicial; # SOC inicial do VE
+display SOC_max; # SOC máximo do VE 
+display consumo; # Taxa de consumo de energia por distância
+display c_p; # Custo de cada painel fotovoltaico
+display c_b; # Custo de cada bateria
+display c_d; # Custo associado ao uso do VE - despesas com motorista, percurso da rota (R$/km)
+display lambda;
+display lambda2;
+display omega;
+
+
+display SOC;
+display SOC_a;
+display tn;
+display tau_CH;
+display beta;
+display gama;
+display Pcarga;
+# display m;
+# 
+
+display E_BAT;
+display P_BAT_c;
+display P_BAT_d;
+display P_virtual;
+# display P_EI;
+display _ampl_time;
+display _total_solve_time;  
+ 
+ param potencia_pv{H,S};
+ for {h in H, s in S}{
+ let potencia_pv [h,s] := z * P_pv_m[h,s];
+ }
+ 
+display potencia_pv;
+
+
+printf '\n\nFuncao objetivo: %s\n', fo;
+printf '\nDistancia total percorrida: %d\n', sum{i in NODOS, j in NODOS}  d[i,j]*x[i,j];;
+printf '\nNumero de paineis fotovoltaicos: %s\n', z;
+printf '\nNumero de baterias: %s\n', y;
+printf '\nCusto de instalacao: %s\n',  z * c_p + y * c_b;
+printf '\nCusto de operacao do VE: %g\n', dias_ano * c_d * alpha * (sum{i in NODOS, j in NODOS} d[i,j]*x[i,j]);
+printf '\nCusto relacionado ao tempo: %g\n', lambda*sum{s in S} pi[s]*(tau_CH[s] + sum{i in NODOS, j in NODOS} d[i,j]/v_max*x[i,j]);
+for {s in S, j in Q}{
+printf '\nNo cenario %s:\n', s;
+printf 'Hora em que chega na estacao de recarga: %g\n', tn[j];
+printf 'Tempo em que ficou carregando na estacao: %g\n', tau_CH[s];
+printf 'Hora de saida da estacao: %g\n', tau_CH[s] +  tn[j];
+}
+
+# Imprimir o resultado do modelo
+# display x;
+# param bandeira;
+# param nodo_atual;
+# param nodo_seguinte;
+# let bandeira := 0;
+# let nodo_atual := 1;
+# printf 'Rota:\n%s', nodo_atual;
+# repeat {
+	# for {j in NODOS} {
+		# if x[nodo_atual,j] == 1  then
+			# let nodo_seguinte := j;
+	# }
+	# let nodo_atual := nodo_seguinte;
+	# printf ', %s', nodo_atual;
+	# if nodo_atual == 1 then
+		# let bandeira := 1;
+# } while (bandeira == 0);
